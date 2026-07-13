@@ -4,13 +4,13 @@ import Header from './components/Header';
 import Projects from './components/Projects';
 import Profile from './components/Profile';
 import ProfileModal from './components/ProfileModal';
+import Welcome from './components/Welcome';
 import { usePerfil, defaultPerfil } from './hooks/usePerfil';
 import { useTrabajos } from './hooks/useTrabajos';
 import { alertSuccess, alertError } from './lib/alert';
 
 const SIDEBAR_STORAGE_KEY = 'josedev-sidebar-collapsed';
 const THEME_STORAGE_KEY = 'portfolio_theme';
-const editMode = import.meta.env.VITE_EDIT_MODE === 'true';
 
 function loadSidebarCollapsed() {
   try {
@@ -29,7 +29,9 @@ function App() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem(THEME_STORAGE_KEY) === 'dark');
+  const [accessMode, setAccessMode] = useState(null);
   const mainContentRef = useRef(null);
+  const editMode = accessMode === 'admin';
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_STORAGE_KEY, String(sidebarCollapsed));
@@ -87,6 +89,17 @@ function App() {
       throw new Error('save-perfil-failed');
     }
   };
+
+  if (accessMode === null) {
+    return (
+      <Welcome
+        perfil={perfil ?? defaultPerfil}
+        loading={loadingPerfil}
+        onGuestAccess={() => setAccessMode('guest')}
+        onAdminAccess={() => setAccessMode('admin')}
+      />
+    );
+  }
 
   return (
     <div className={`layout${darkMode ? ' dark' : ''}`}>
